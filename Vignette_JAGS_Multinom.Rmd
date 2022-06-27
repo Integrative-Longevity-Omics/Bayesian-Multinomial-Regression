@@ -1,0 +1,261 @@
+---
+title: "Bayesian Multinomial Logistic Regression Initialization and Application: Differential analysis of the distribution of peripheral blood mononuclear cells"
+author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
+output:
+  html_document:
+    theme: paper
+    code_folding: show
+    toc: true
+    toc_float: true
+    toc_collapse: false
+---
+
+# Introduction
+
+Differential analysis of the distribution of peripheral blood mononuclear cells. Bayesian multinomial logistic regression model initialization and example application to cell type distributions of PBMCs with age.
+
+
+Install the model_multinom.R function by cloning the github repository and load the function in R.
+
+```{r, include = FALSE}
+#Set work directory and load libraries
+work.dir <- "/restricted/projectnb/uh2-sebas/analysis/scCentenarians/Composition_Multinomial/RJAGS_Composition_Analysis/"
+
+```
+
+```{r, messages=FALSE, warnings=FALSE}
+source('./model_multinom.R')
+```
+
+# Usage
+
+We demonstrate the implementation of the multinomial logistic regression model to cell type composition level data of PBMCs from 66 subjects representing four age groups of the human lifespan. In this example, we show how to run the multinomial logistic regression model created in rjags on cell type abundance per samples including model initialization, parameter inference, and obtaining posterior distributions of the sample proportions across conditions.
+
+Summary:
+
+- Input: cell counts of samples across cell types 
+- Output: Cell type specific probability estimates of composition per age group/sex, and significance of age group effect (reference level = Younger Age) and sex (reference level = Male)
+
+
+# Load libraries
+
+```{r, message = FALSE}
+
+library(tidyverse)
+library(rjags)
+library(coda)
+library(hablar)
+library(patchwork)
+```
+
+
+Data: 
+
+- cell_counts = Cell counts of samples across cell types
+- N.sample = number of samples
+- N.ct = number of cell types
+- N.total = total number of cells per sample
+- N.age = number of age groups
+- age.group = age group information per sample (Younger = 1, Middle = 2, Older = 3, EL = 4)
+- sex = sex information per sample (Male = 1, Female = 2)
+
+```{r}
+rjags_data <- readRDS(paste0(work.dir,"rjags_dataobj.rds"))
+
+rjags_data
+```
+
+# Run multinomial logistic regression model on cell type composition data
+```{r}
+set.seed(562)
+#load model
+source(paste0(work.dir,"model_multinom.R"))
+
+#Run model with 500 burnin iterations and 1000 total iterations
+#Parameter Inference: monitor age group effect (b1), sex effect (b2) and predicted probabilities (p)
+jags <- jags.model(textConnection(multinom.model),data=rjags_data, n.adapt=500, inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 3))
+coda.model <- coda.samples(jags, c("b1","b2","p"), n.iter=1000)
+
+#model summary of mean estimates, standard errors, 95% credible intervals for parameters of interest
+coda.summary <- summary(coda.model)
+```
+
+
+# Significance of the effect of age in each cell type:
+
+- comparing the Middle, Older, and EL age groups to Younger age (reference group)
+- extracting the mean estimate and standard error of the posterior distribution for b1 parameter
+- calculated z-scores, p-values, and fdr significance
+
+
+```{r}
+#extract age effects for each cell type
+#mean estimate for b1[age.group, cell type]
+
+b1.pos <- grep("b1", names(coda.summary$statistics[,"Mean"]))
+b1.names <- names(coda.summary$statistics[b1.pos,"Mean"])
+b1.effects <- coda.summary$statistics[,c("Mean", "SD")][b1.pos,] %>%
+                as_tibble(rownames = "coef") %>%
+                mutate("cell.type" = c(sapply(1:rjags_data$N.ct,function(x) rep(colnames(rjags_data$y)[x],rjags_data$N.age))), 
+                       "age.group" = rep(c("Younger.Ref","Middle.v.Younger", "Older.v.Younger", "EL.v.Younger"), rjags_data$N.ct)
+                       ) %>%
+                filter(age.group != "Younger.Ref") %>%
+                mutate("zscore" = Mean/SD,
+                       "pval" = 2*(1-pnorm(abs(zscore))),
+                       "fdr" = p.adjust(pval,method="BH")
+                       ) %>%
+                dplyr::select(coef, cell.type, age.group, Mean, SD, zscore, pval, fdr)
+
+#Table of age group effects
+b1.effects
+
+```
+
+# Significance of the effect of sex in each cell type:
+
+- comparing Females to Males (reference group)
+- extracting the mean estimate and standard error of the posterior distribution for b2 parameter
+- calculated z-scores, p-values, and fdr significance
+
+```{r}
+#extract sex effects for each cell type
+#mean estimate for b2[sex, cell type]
+b2.pos <- grep("b2", names(coda.summary$statistics[,"Mean"]))
+b2.names <- names(coda.summary$statistics[b2.pos,"Mean"])
+b2.effects <- coda.summary$statistics[,c("Mean", "SD")][b2.pos,] %>%
+                as_tibble(rownames = "coef") %>%
+                mutate("cell.type" = c(sapply(1:rjags_data$N.ct,function(x) rep(colnames(rjags_data$y)[x],2))), 
+                       "sex" = rep(c("Male","Female.v.Male"), rjags_data$N.ct)
+                       ) %>%
+                filter(Mean != 0 & SD != 0) %>%
+                mutate("zscore" = Mean/SD,
+                       "pval" = 2*(1-pnorm(abs(zscore))),
+                       "fdr" = p.adjust(pval,method="BH")
+                       ) %>%
+                dplyr::select(coef, cell.type, sex, Mean, SD, zscore, pval, fdr)
+
+#Table of sex effects
+b2.effects
+```
+
+# Extract cell type specific predicted probabilities and credible intervals
+
+## Predicted probabilities
+```{r}
+#extract probabilities and create matrix with rows as samples and columns as cell types
+#Extract mean and SE
+predicted.estimate <- coda.summary$statistics[,c("Mean", "SD")][-c(b1.pos, b2.pos),] %>%
+                as_tibble(rownames = "coef") %>%
+                mutate("sample.ID" = rep(rownames(rjags_data$y), rjags_data$N.ct),
+                  "cell.type" = c(sapply(1:rjags_data$N.ct,function(x) rep(colnames(rjags_data$y)[x],rjags_data$N.sample))), 
+                  "age.group" = rep(rjags_data$age.group, rjags_data$N.ct),
+                  "sex" = rep(rjags_data$sex, rjags_data$N.ct)
+                       )
+#Extract 95% credible interval
+predicted.credible <- coda.summary$quantiles[,c("2.5%", "97.5%")][-c(b1.pos, b2.pos),] %>%
+                as_tibble(rownames = "coef") %>%
+                mutate("sample.ID" = rep(rownames(rjags_data$y), rjags_data$N.ct),
+                  "cell.type" = c(sapply(1:rjags_data$N.ct,function(x) rep(colnames(rjags_data$y)[x],rjags_data$N.sample))), 
+                       "age.group" = rep(rjags_data$age.group, rjags_data$N.ct),
+                  "sex" = rep(rjags_data$sex, rjags_data$N.ct)
+                  ) %>%
+                rename(CI_2.5 = "2.5%", CI_97.5 = "97.5%")
+
+#merge dataframes together using join
+predicted.prob <- inner_join(predicted.estimate, predicted.credible, by = c("coef", "cell.type", "age.group", "sample.ID", "sex")) %>%
+            hablar::convert(fct(age.group, cell.type, sex))
+
+#add back names of age.group and sex levels
+levels(predicted.prob$age.group) <- c("Younger", "Middle", "Older", "EL")
+levels(predicted.prob$sex) <- c("Male", "Female")
+            
+
+#Table of predicted probabilities           
+predicted.prob
+
+```
+
+
+# Relative proportion of cell types per age group to compare with the probability estimates
+```{r}
+# read in metadata information 
+meta.dat <- read_csv(paste0(work.dir, "sample_metadata.csv"))
+
+#extract cell counts per sample across cell types from rjags_data object
+cell_counts <- rjags_data$y
+names(dimnames(cell_counts)) <- c("sample.ID", "cell.type")
+
+#calculate relative cell type proportions for each sample and join with metadata information for each sample
+relative.prop <- as_tibble(cell_counts) %>%
+                      full_join(meta.dat, by = "sample.ID") %>%
+                      group_by(sample.ID) %>%
+                      mutate(proportion = n / sum(n)) %>%
+                      hablar::convert(fct(cell.type, age.group, sex))
+```
+
+```{r, include = F}
+relative.prop$age.group <- factor(relative.prop$age.group, levels = c("20-39", "40-59", "60-89", "Extreme Longevity"))
+levels(relative.prop$age.group) <- c("Younger", "Middle", "Older", "EL")
+```
+
+```{r}
+#Table of relative proportions
+relative.prop
+
+```
+
+# Plot cell type probabilities and relative proportions across age groups
+
+```{r, fig.width = 20, fig.height = 10}
+# create table of cell type predicted probability estimates and relative proportions per sample for comparison
+plot.real.est <- inner_join(predicted.prob, relative.prop, by = c("sample.ID", "cell.type", "age.group", "sex"))
+
+plot.real.est$sex <- factor(plot.real.est$sex, levels = c("Female", "Male"))
+
+# Plot to compare predicted probabilities and relative proportions
+# Group 3: cell types with greater probability estimates
+real.est.group1 <- plot.real.est %>%
+                          filter(cell.type == "nCD4TC" | cell.type == "mCD4TC" | cell.type == "cCD8TC" | cell.type == "NK" | cell.type == "M14")
+
+plot.relative.group1 <- ggplot(data = real.est.group1) + 
+        geom_boxplot(aes(age.group, proportion, color = sex))+
+        scale_color_manual(values = c("blue2","maroon")) +
+  geom_pointrange(aes(x = age.group, y = Mean, ymin=CI_2.5, ymax=CI_97.5, group = 1), size = 1) +
+  geom_line(aes(x = age.group, y = Mean, group = 1), size = 1) + 
+        facet_grid(sex~cell.type, scale = 'fixed') +  
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+        theme_bw(base_size = 30) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+plot.relative.group1
+
+
+# Group 2: cell types with lower probability estimates
+real.est.group2 <- plot.real.est %>%
+                          filter(cell.type == "cCD4TC" | cell.type == "M16" | cell.type == "nBC" | cell.type == "gdTC")
+
+plot.relative.group2 <- ggplot(data = real.est.group2) + 
+        geom_boxplot(aes(age.group, proportion, color = sex))+
+        scale_color_manual(values = c("blue2","maroon")) +
+  geom_pointrange(aes(x = age.group, y = Mean, ymin=CI_2.5, ymax=CI_97.5, group = 1), size = 1) +
+  geom_line(aes(x = age.group, y = Mean, group = 1), size = 1) + 
+        facet_grid(sex~cell.type, scale = 'fixed') +  
+        theme_bw(base_size = 30) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+plot.relative.group2
+
+# Group 3: cell types with smaller probability estimates
+real.est.group3 <- plot.real.est %>%
+                          filter(cell.type == "mBC"| cell.type == "pBC" | cell.type == "mDC" | cell.type == "pDC")
+
+plot.relative.group3 <- ggplot(data = real.est.group3) + 
+        geom_boxplot(aes(age.group, proportion, color = sex))+
+        scale_color_manual(values = c("blue2","maroon")) +
+  geom_pointrange(aes(x = age.group, y = Mean, ymin=CI_2.5, ymax=CI_97.5, group = 1), size = 1) +
+  geom_line(aes(x = age.group, y = Mean, group = 1), size = 1) + 
+        facet_grid(sex~cell.type, scale = 'fixed') +  
+        theme_bw(base_size = 30) +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+plot.relative.group3
+```
+
+
