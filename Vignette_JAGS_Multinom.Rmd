@@ -1,5 +1,5 @@
 ---
-title: "Bayesian Multinomial Logistic Regression Initialization and Application: Differential analysis of the distribution of peripheral blood mononuclear cells"
+title: "Bayesian MLR Initialization and Application: Differential analysis of the distribution of peripheral blood cells"
 author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
 output:
   html_document:
@@ -12,7 +12,7 @@ output:
 
 # Introduction
 
-Differential analysis of the distribution of peripheral blood mononuclear cells. Bayesian multinomial logistic regression model initialization and example application to cell type distributions of PBMCs with age.
+Bayesian MLR: Differential analysis of the distribution of peripheral blood cells. Bayesian multinomial logistic regression model initialization and example application to cell type distributions of PBMCs with age.
 
 
 Install the model_multinom.R function by cloning the github repository and load the function in R.
@@ -40,7 +40,6 @@ Summary:
 # Load libraries
 
 ```{r, message = FALSE}
-
 library(tidyverse)
 library(rjags)
 library(coda)

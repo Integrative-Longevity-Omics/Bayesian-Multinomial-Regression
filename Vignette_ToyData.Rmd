@@ -1,0 +1,113 @@
+---
+title: "Bayesian MLR: Toy dataset example"
+author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
+output:
+  html_document:
+    theme: paper
+    code_folding: show
+    toc: true
+    toc_float: true
+    toc_collapse: false
+---
+
+# Introduction
+
+Bayesian MLR: Differential analysis of the distribution of peripheral blood cells. Bayesian multinomial logistic regression model initialization and example application to a generated toy dataset.
+
+Install the model_multinom.R function by cloning the github repository and load the function in R.
+
+```{r, include = FALSE}
+#Set work directory and load libraries
+work.dir <- "/restricted/projectnb/uh2-sebas/analysis/scCentenarians/Composition_Multinomial/RJAGS_Composition_Analysis/"
+
+```
+
+```{r, messages=FALSE, warnings=FALSE}
+source('./model_multinom.R')
+```
+
+# Usage
+
+In this example, we generate a toy dataset and apply the Bayesian multinomial logistic regression model to the distributions of 10 randomly generated samples (labelled 5 younger and 5 older) with max 10000 counts with 3 cell types with set proportions that add up to 1.
+
+# Load libraries
+
+```{r, message = FALSE}
+library(tidyverse)
+library(rjags)
+library(coda)
+library(hablar)
+library(patchwork)
+```
+
+
+## Generate toy dataset
+```{r}
+set.seed(562)
+# 5 younger samples with set probabilities (0.1, 0.2, 0.7) of 3 categories (i.e. cell types)
+sim.data.Y <- t(rmultinom(5, size = 10000, prob = c(0.1,0.2,0.7)))
+# 5 older samples with set probabilities (0.2, 0.3, 0.5) of 3 categories (i.e. cell types)
+sim.data.O <- t(rmultinom(5, size = 10000, prob = c(0.2,0.3,0.5)))
+#bind sample count together
+sim.data <- rbind(sim.data.Y, sim.data.O)
+
+#create an age variable with 3 younger samples and 3 older samples
+age.group <- c(rep(1,5), rep(2,5))
+#pull simulated data and age variable in jags data object
+jags.data <- list(y = sim.data, #simulated counts
+                  age.group = factor(age.group), #age group label (younger = 1, older = 2)
+                  N.sample = nrow(sim.data), #number of samples
+                  N.ct = ncol(sim.data), #number of cell types
+                  N.total = rep(10000,10), #total number of counts per sample
+                  N.age = 2, #number of age groups
+                  sex = sample(1:2, 10, replace = TRUE) #sex label 
+)
+jags.data
+
+```
+
+## Run Bayesian multinomial logistic regression model
+
+```{r}
+#Run model with 500 burn-in iterations and 1000 total iterations
+jags <- jags.model(textConnection(multinom.model),data=jags.data, n.adapt=500, inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 5))
+#monitor predicted probabilities p
+test <- coda.samples(jags, c('p'), n.adapt = 500, n.iter=1000)
+
+```
+
+## Obtain predicted probabilities of cell types for each sample
+
+```{r}
+#Get estimates of p[i,j] for sample i and category j
+coda.summary <- summary(test) 
+predicted.prob <- coda.summary$statistics %>% as_tibble() %>% select(Mean)
+predicted.prob <- matrix(as.vector(predicted.prob$Mean), nrow = 10, ncol = 3)
+predicted.prob
+
+#predicted probabilities for each sample should add up to 1
+apply(predicted.prob,1,sum)
+```
+
+# Diagnostics for model convergence
+
+## Density and trace plots
+
+```{r, fig.dim = c(20,10)}
+plot(test)
+```
+
+## Autocorrelation
+
+```{r}
+autocorr.plot(test)
+
+```
+
+## Geweke convergence diagnostic
+
+```{r}
+geweke.diag(test)
+
+```
+
