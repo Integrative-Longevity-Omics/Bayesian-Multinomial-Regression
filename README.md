@@ -11,7 +11,6 @@ install.packages(tidyverse)
 install.packages("rjags")
 install.packages("coda")
 install.packages("hablar")
-install.packages("broom")
 install.packages("patchwork")
 ```
 
