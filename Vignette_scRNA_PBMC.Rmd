@@ -1,5 +1,5 @@
 ---
-title: "Bayesian MLR Initialization and Application: Differential analysis of the distribution of peripheral blood cells"
+title: "Bayesian MLR: Initialization and application to scRNA-seq data of PBMCs across age groups"
 author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
 output:
   html_document:
