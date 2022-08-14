@@ -1,6 +1,6 @@
 # Bayesian Multinomial Logistic Regression to analyze the distributions of cell types
 
-Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian MLR: Differential analysis of the distribution of peripheral blood mononuclear cells
+Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian MLR: Differential analysis of the distribution of peripheral blood cells
 
 ## Dependencies
 * Before running the Bayesian MLR, make sure that R and JAGS are installed.
