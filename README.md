@@ -22,5 +22,5 @@ Model application including parameter inference and obtaining posterior distribu
 
 - simulated toy dataset: Vignette_ToyData.Rmd
 
-- scRNA-seq data of PBMCs across age: Vignette_JAGS_Multinom.Rmd
+- scRNA-seq data of PBMCs across age: Vignette_scRNA_PBMC.Rmd
  
