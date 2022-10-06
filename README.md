@@ -1,9 +1,9 @@
-# Bayesian Multinomial Logistic Regression to analyze the distributions of cell types
+# Bayesian multinomial logistic model to analyze the distributions of cell types
 
-Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian MLR: Differential analysis of the distribution of peripheral blood mononuclear cells
+Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian differential cell type proportion analysis.
 
 ## Dependencies
-* Before running the Bayesian MLR, make sure that R and JAGS are installed.
+* Before running the Bayesian multinomial logistic model, make sure that R and JAGS are installed.
 * Install the following R packages if not installed already:
 
 ```
