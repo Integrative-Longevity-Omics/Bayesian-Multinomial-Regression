@@ -1,4 +1,4 @@
-# Bayesian multinomial logistic model to analyze the distributions of cell types
+# Bayesian differential cell type proportion analysis: Bayesian multinomial logistic model to analyze the distributions of cell types
 
 Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian differential cell type proportion analysis.
 
