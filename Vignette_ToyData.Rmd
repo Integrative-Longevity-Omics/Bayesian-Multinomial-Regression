@@ -1,5 +1,5 @@
 ---
-title: "Bayesian MLR: Toy dataset example"
+title: "Bayesian differential cell type proportion analysis: Toy dataset example"
 author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
 output:
   html_document:
@@ -12,7 +12,7 @@ output:
 
 # Introduction
 
-Bayesian MLR: Differential analysis of the distribution of peripheral blood cells. Bayesian multinomial logistic regression model initialization and example application to a generated toy dataset.
+Bayesian differential cell type proportion analysis: Bayesian multinomial logistic regression model initialization and example application to a generated toy dataset.
 
 Install the model_multinom.R function by cloning the github repository and load the function in R.
 
@@ -70,7 +70,7 @@ jags.data
 
 ```{r}
 #Run model with 500 burn-in iterations and 1000 total iterations
-jags <- jags.model(textConnection(multinom.model),data=jags.data, n.adapt=500, inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 5))
+jags <- jags.model(textConnection(multinom.model),data=jags.data, n.adapt=500, inits = list(.RNG.name = "base::Wichmann-Hill", .RNG.seed = 10))
 #monitor predicted probabilities p
 test <- coda.samples(jags, c('p'), n.adapt = 500, n.iter=1000)
 

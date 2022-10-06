@@ -1,5 +1,5 @@
 ---
-title: "Bayesian MLR: Initialization and application to scRNA-seq data of PBMCs across age groups"
+title: "Bayesian differential cell type proportion analysis: Initialization and application to scRNA-seq data of PBMCs across age groups"
 author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
 output:
   html_document:
@@ -12,7 +12,7 @@ output:
 
 # Introduction
 
-Bayesian MLR: Differential analysis of the distribution of peripheral blood cells. Bayesian multinomial logistic regression model initialization and example application to cell type distributions of PBMCs with age.
+Bayesian differential cell type proportion analysis: Bayesian multinomial logistic regression model initialization and example application to cell type distributions of PBMCs with age.
 
 
 Install the model_multinom.R function by cloning the github repository and load the function in R.
@@ -40,6 +40,7 @@ Summary:
 # Load libraries
 
 ```{r, message = FALSE}
+
 library(tidyverse)
 library(rjags)
 library(coda)
