@@ -24,5 +24,5 @@ Model application including parameter inference and obtaining posterior distribu
 
 - scRNA-seq data of PBMCs across age: Vignette_scRNA_PBMC.Rmd
 
-scCODA python application to scRNA-seq data of PBMCs across age for comparison: scCODA_Comparison.html 
+scCODA python application to scRNA-seq data of PBMCs across age for comparison: scCODA_Comparison.ipynb
  
