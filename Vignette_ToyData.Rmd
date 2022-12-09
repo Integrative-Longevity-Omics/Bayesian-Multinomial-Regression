@@ -1,5 +1,5 @@
 ---
-title: "Bayesian differential cell type proportion analysis: Toy dataset example"
+title: "Bayesian Differential Analysis of Cell Type Proportions: Toy dataset example"
 author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
 output:
   html_document:
@@ -12,7 +12,7 @@ output:
 
 # Introduction
 
-Bayesian differential cell type proportion analysis: Bayesian multinomial logistic regression model initialization and example application to a generated toy dataset.
+Bayesian Differential Analysis of Cell Type Proportions: Bayesian multinomial regression model initialization and example application to a generated toy dataset.
 
 Install the model_multinom.R function by cloning the github repository and load the function in R.
 
@@ -28,7 +28,7 @@ source('./model_multinom.R')
 
 # Usage
 
-In this example, we generate a toy dataset and apply the Bayesian multinomial logistic regression model to the distributions of 10 randomly generated samples (labelled 5 younger and 5 older) with max 10000 counts with 3 cell types with set proportions that add up to 1.
+In this example, we generate a toy dataset and apply the Bayesian multinomial regression model to the distributions of 10 randomly generated samples (labelled 5 younger and 5 older) with max 10000 counts with 3 cell types with set proportions that add up to 1.
 
 # Load libraries
 
@@ -66,7 +66,7 @@ jags.data
 
 ```
 
-## Run Bayesian multinomial logistic regression model
+## Run Bayesian multinomial regression model
 
 ```{r}
 #Run model with 500 burn-in iterations and 1000 total iterations

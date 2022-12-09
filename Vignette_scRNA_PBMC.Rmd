@@ -1,18 +1,20 @@
 ---
-title: "Bayesian differential cell type proportion analysis: Initialization and application to scRNA-seq data of PBMCs across age groups"
-author: Tanya Karagiannis, Stefano Monti, Paola Sebastiani
+title: "Bayesian Differential Analysis of Cell Type Proportions: Initialization and application to scRNA-seq data of PBMCs across age groups"
+author: "Tanya Karagiannis, Stefano Monti, Paola Sebastiani"
 output:
   html_document:
     theme: paper
     code_folding: show
-    toc: true
-    toc_float: true
-    toc_collapse: false
+    toc: yes
+    toc_float: yes
+    toc_collapse: no
+  word_document:
+    toc: yes
 ---
 
 # Introduction
 
-Bayesian differential cell type proportion analysis: Bayesian multinomial logistic regression model initialization and example application to cell type distributions of PBMCs with age.
+Bayesian Differential Analysis of Cell Type Proportions: Bayesian multinomial regression model initialization and example application to cell type distributions of PBMCs with age.
 
 
 Install the model_multinom.R function by cloning the github repository and load the function in R.
@@ -29,7 +31,7 @@ source('./model_multinom.R')
 
 # Usage
 
-We demonstrate the implementation of the multinomial logistic regression model to cell type composition level data of PBMCs from 66 subjects representing four age groups of the human lifespan. In this example, we show how to run the multinomial logistic regression model created in rjags on cell type abundance per samples including model initialization, parameter inference, and obtaining posterior distributions of the sample proportions across conditions.
+We demonstrate the implementation of the multinomial regression model to cell type composition level data of PBMCs from 66 subjects representing four age groups of the human lifespan. In this example, we show how to run the multinomial regression model created in rjags on cell type abundance per samples including model initialization, parameter inference, and obtaining posterior distributions of the sample proportions across conditions.
 
 Summary:
 
@@ -65,7 +67,7 @@ rjags_data <- readRDS(paste0(work.dir,"rjags_dataobj.rds"))
 rjags_data
 ```
 
-# Run multinomial logistic regression model on cell type composition data
+# Run multinomial regression model on cell type composition data
 ```{r}
 set.seed(562)
 #load model

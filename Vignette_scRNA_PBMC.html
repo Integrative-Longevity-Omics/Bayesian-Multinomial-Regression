@@ -12,7 +12,7 @@
 <meta name="author" content="Tanya Karagiannis, Stefano Monti, Paola Sebastiani" />
 
 
-<title>Bayesian differential cell type proportion analysis: Initialization and application to scRNA-seq data of PBMCs across age groups</title>
+<title>Bayesian Differential Analysis of Cell Type Proportions: Initialization and application to scRNA-seq data of PBMCs across age groups</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1613,8 +1613,8 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Bayesian differential cell type proportion
-analysis: Initialization and application to scRNA-seq data of PBMCs
+<h1 class="title toc-ignore">Bayesian Differential Analysis of Cell Type
+Proportions: Initialization and application to scRNA-seq data of PBMCs
 across age groups</h1>
 <h4 class="author">Tanya Karagiannis, Stefano Monti, Paola
 Sebastiani</h4>
@@ -1624,22 +1624,22 @@ Sebastiani</h4>
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>Bayesian differential cell type proportion analysis: Bayesian
-multinomial logistic regression model initialization and example
-application to cell type distributions of PBMCs with age.</p>
+<p>Bayesian Differential Analysis of Cell Type Proportions: Bayesian
+multinomial regression model initialization and example application to
+cell type distributions of PBMCs with age.</p>
 <p>Install the model_multinom.R function by cloning the github
 repository and load the function in R.</p>
 <pre class="r"><code>source(&#39;./model_multinom.R&#39;)</code></pre>
 </div>
 <div id="usage" class="section level1">
 <h1>Usage</h1>
-<p>We demonstrate the implementation of the multinomial logistic
-regression model to cell type composition level data of PBMCs from 66
-subjects representing four age groups of the human lifespan. In this
-example, we show how to run the multinomial logistic regression model
-created in rjags on cell type abundance per samples including model
-initialization, parameter inference, and obtaining posterior
-distributions of the sample proportions across conditions.</p>
+<p>We demonstrate the implementation of the multinomial regression model
+to cell type composition level data of PBMCs from 66 subjects
+representing four age groups of the human lifespan. In this example, we
+show how to run the multinomial regression model created in rjags on
+cell type abundance per samples including model initialization,
+parameter inference, and obtaining posterior distributions of the sample
+proportions across conditions.</p>
 <p>Summary:</p>
 <ul>
 <li>Input: cell counts of samples across cell types</li>
@@ -1850,9 +1850,8 @@ rjags_data</code></pre>
 ## [39] 1 2 2 1 1 1 2 2 2 2 1 1 1 2 2 1 2 2 2 2 1 1 2 2 2 1 1 2
 ## Levels: 1 2</code></pre>
 </div>
-<div id="run-multinomial-logistic-regression-model-on-cell-type-composition-data" class="section level1">
-<h1>Run multinomial logistic regression model on cell type composition
-data</h1>
+<div id="run-multinomial-regression-model-on-cell-type-composition-data" class="section level1">
+<h1>Run multinomial regression model on cell type composition data</h1>
 <pre class="r"><code>set.seed(562)
 #load model
 source(paste0(work.dir,&quot;model_multinom.R&quot;))

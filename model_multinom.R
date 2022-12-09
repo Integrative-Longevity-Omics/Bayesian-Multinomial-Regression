@@ -44,7 +44,7 @@ model
         b1[k,j] ~ dnorm(0, 0.001) #rest of the age groups' prior initializations
       }
       b2[1,j] <- 0 #reference sex set to 0
-      b2[2,j] ~ dnorm(0, 0.001) #rest of the age groups' prior initializations
+      b2[2,j] ~ dnorm(0, 0.001) #rest of the group prior initializations
       b0[j]  ~ dnorm(0, 0.001)
     
     }
