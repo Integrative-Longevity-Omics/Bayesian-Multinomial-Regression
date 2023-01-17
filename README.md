@@ -1,6 +1,6 @@
-# Bayesian Differential Analysis of Cell Type Proportions: Short Report
+# Bayesian Differential Analysis of Cell Type Proportions
 
-Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian Differential Analysis of Cell Type Proportions: Short Report.
+Code for Manuscript in Progress: Karagiannis, TT, Monti, S, and Sebastiani, P. Bayesian Differential Analysis of Cell Type Proportions.
 
 ## Dependencies
 * Before running the Bayesian multinomial model, make sure that R and JAGS are installed.
